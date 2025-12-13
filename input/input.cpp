@@ -8,53 +8,73 @@
     #include <fcntl.h>
 #endif
 
-namespace Input {
+namespace input {
 
-static Key mapAscii(char c) {
+// ================= ASCII MAPPING =================
+static key mapAscii(int c) {
     if (c >= 'a' && c <= 'z')
-        return Key(c - 'a' + (int)Key::A);
+        return key(c - 'a' + (int)key::A);
 
     if (c >= 'A' && c <= 'Z')
-        return Key(c - 'A' + (int)Key::A);
+        return key(c - 'A' + (int)key::A);
 
     if (c >= '0' && c <= '9')
-        return Key(c - '0' + (int)Key::Num0);
+        return key(c - '0' + (int)key::Num0);
 
     switch (c) {
-        case ' ': return Key::Space;
-        case '\n': return Key::Enter;
-        case '\t': return Key::Tab;
-        case 27:   return Key::Escape;
-        case 8:    return Key::Backspace;
-        default:   return Key::Unknown;
+        case ' ':  return key::Space;
+        case '\n':
+        case '\r': return key::Enter;
+        case '\t': return key::Tab;
+        case 8:
+        case 127:  return key::Backspace;
+        case 27:   return key::Escape;
+        default:   return key::Unknown;
     }
 }
 
-bool pollEvent(Event& e) {
 #ifdef _WIN32
-
-    if (!_kbhit()) return false;
+// ================= WINDOWS =================
+bool pollEvent(event& e) {
+    if (!_kbhit())
+        return false;
 
     int ch = _getch();
 
+    // Arrow keys
     if (ch == 0 || ch == 224) {
         ch = _getch();
         switch (ch) {
-            case 72: e.key = Key::Up;    break;
-            case 80: e.key = Key::Down;  break;
-            case 75: e.key = Key::Left;  break;
-            case 77: e.key = Key::Right; break;
-            default: e.key = Key::Unknown;
+            case 72: e.keycode = key::Up;    break;
+            case 80: e.keycode = key::Down;  break;
+            case 75: e.keycode = key::Left;  break;
+            case 77: e.keycode = key::Right; break;
+            default: e.keycode = key::Unknown;
         }
-    } else {
-        e.key = mapAscii((char)ch);
+    }
+    else {
+        // IMPORTANT: handle Enter FIRST
+        key k = mapAscii(ch);
+
+        if (k != key::Unknown) {
+            e.keycode = k;
+        }
+        // Ctrl + A to Z (1–26)
+        else if (ch >= 1 && ch <= 26) {
+            e.keycode = key((ch - 1) + (int)key::A);
+        }
+        else {
+            e.keycode = key::Unknown;
+        }
     }
 
     e.pressed = true;
     return true;
+}
 
-#else 
-
+#else
+// ================= LINUX =================
+bool pollEvent(event& e) {
     static bool init = false;
     static termios oldt;
 
@@ -69,23 +89,33 @@ bool pollEvent(Event& e) {
     }
 
     int ch = getchar();
-    if (ch == EOF) return false;
+    if (ch == EOF)
+        return false;
 
+    // Escape sequence (arrows)
     if (ch == 27) {
-        if (getchar() == '[') {
-            switch (getchar()) {
-                case 'A': e.key = Key::Up;    break;
-                case 'B': e.key = Key::Down;  break;
-                case 'D': e.key = Key::Left;  break;
-                case 'C': e.key = Key::Right; break;
-                default:  e.key = Key::Unknown;
+        int a = getchar();
+        int b = getchar();
+
+        if (a == '[') {
+            switch (b) {
+                case 'A': e.keycode = key::Up;    break;
+                case 'B': e.keycode = key::Down;  break;
+                case 'C': e.keycode = key::Right; break;
+                case 'D': e.keycode = key::Left;  break;
+                default:  e.keycode = key::Unknown;
             }
+        } else {
+            e.keycode = key::Escape;
         }
-    } else {
-        e.key = mapAscii((char)ch);
+    }
+    else {
+        e.keycode = mapAscii(ch);
     }
 
     e.pressed = true;
     return true;
+}
 #endif
-}}
+
+} // namespace input
