@@ -21,13 +21,9 @@ long long y=3;
 long long sta=0;
 stack<string> menu;
 string screen;
-string prescreen;
-
 vector<vector<char>> void_screen(x , vector<char> (y ,' '));
-
-
-
-
+map<string, string> main_menu_data ={{"tittle","WELCOME TO YORK" },{"selecter","0"}};
+long long main_menu_selecter=0;
 
 string  conchtos(vector<vector<char>>scn){
     string s;
@@ -69,6 +65,28 @@ void printer(vector<vector<char>> vec , bool hilou){
         cout<<screen;
     }
 }
+void screen_size_limit(){
+    clearscreen(1);
+    cout<<"this game has been crashed due to limited screen size , please restart the game and claibrate bigger screen";
+    this_thread::sleep_for(chrono::milliseconds(5000));
+    exit(0);
+}
+vector<vector<char>> screen_maker(vector<string>&socho){
+    vector<vector<char>> dominator = screenresize(x,y);
+    long long xo=1;
+    for(auto val:socho){
+        if(xo+1==x)screen_size_limit();
+        long long yo=1;
+        for(auto valo:val){
+            if(yo+1==y)screen_size_limit();
+            dominator[xo][yo]=valo;
+            yo++;
+        }
+        xo++;
+    }
+    return  dominator;
+    
+}
 
 int main(){
     // ios::sync_with_stdio(false);
@@ -78,7 +96,7 @@ int main(){
     input::event e;
     string k="-";
     menu.push("screen_calibrate");
-    cout<<"Calibrate your screen"<<endl<<endl<<"press w,a,s,d to calibrate"<<endl<<endl<<"press enter to start calibrate your screen";
+    cout<<"Calibrate your screen"<<endl<<endl<<"controls-> w,a,s,d , enter , space"<<endl<<endl<<"press enter to start calibrate your screen";
                 
     while (true) {
         if(menu.empty()){
@@ -106,6 +124,7 @@ int main(){
         }
         
         this_thread::sleep_for(chrono::milliseconds(frame_time));
+        k="-";
 
         if (input::pollEvent(e)) {
             if (e.keycode == input::key::Q)break;
@@ -115,6 +134,7 @@ int main(){
             if(e.keycode == input::key::S)k="s";
             if(e.keycode == input::key::D)k="d"; 
             if(e.keycode == input::key::Enter)k="ent"; 
+            if(e.keycode == input::key::Space)k="spc"; 
             // cout<<(int)e.key<<endl;      
             if(e.keycode == input::key::C){
                 menu.pop();
@@ -122,12 +142,11 @@ int main(){
             }
         
         }
-        else k="-";
         // cout<<k;
         if(menu.top()=="screen_calibrate"){
             
             if(sta==0){
-                if(k=="ent"){
+                if((k=="ent")||(k=="spc")){
                     sta=1;
                     clr_scr=1;
                     print_screen=1;
@@ -174,8 +193,24 @@ int main(){
         }
         else if(menu.top()=="main_menu"){
             
+            vector<string> schco;
+            vector<string> options = {"New Game" ,"Continue" ,"Load", "Settings" , "Quit"};
+            schco.push_back(main_menu_data["tittle"]);
+            schco.push_back("");
+            
+            for(long long i=0 ; i<options.size() ; i++){
+                if(i==main_menu_selecter)schco.push_back("->"+options[i]);
+                else schco.push_back(options[i]);
+            }
+            printer(screen_maker(schco),0);
+            if(k=="w")main_menu_selecter--;
+            if(k=="s")main_menu_selecter++;
+            if(main_menu_selecter>=(long long )options.size())main_menu_selecter=0;
+            if(main_menu_selecter<0)main_menu_selecter = (long long )options.size()-1;
             
 
+
+            
         }
 
     }
