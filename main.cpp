@@ -24,6 +24,7 @@ string screen;
 vector<vector<char>> void_screen(x , vector<char> (y ,' '));
 map<string, string> main_menu_data ={{"tittle","WELCOME TO YORK" },{"selecter","0"}};
 long long main_menu_selecter=0;
+long long settings_selecter=0;
 
 string  conchtos(vector<vector<char>>scn){
     string s;
@@ -207,10 +208,29 @@ int main(){
             if(k=="s")main_menu_selecter++;
             if(main_menu_selecter>=(long long )options.size())main_menu_selecter=0;
             if(main_menu_selecter<0)main_menu_selecter = (long long )options.size()-1;
-            
+            vector<string> opt = {"new_game" , "continue" , "load" , "settings" , "quit"};
+            if((k=="spc")||(k=="ent"))menu.push(opt[main_menu_selecter]);                        
+        }
+        else if(menu.top()=="quit")break;
 
+        else if(menu.top()=="settings"){
+            vector<string> colin;
+            vector<string> opt = {"quit"};
+            vector<string> options= {"Quit"};
+            colin.push_back("SETTINGS");
+            for(long long i=0 ; i<options.size() ; i++){
+                if(i==settings_selecter)colin.push_back("->"+options[i]);
+                else colin.push_back(options[i]);
+            }
+            printer(screen_maker(colin) ,0);
+            if(k=="w")settings_selecter--;
+            if(k=="s")settings_selecter++;
+            if(settings_selecter>=(long long )options.size())settings_selecter=0;
+            if(settings_selecter<0)settings_selecter = (long long )options.size()-1;
+            if((k=="ent")||(k=="spc")){
+                if(opt[settings_selecter]=="quit")menu.pop();
+            }
 
-            
         }
 
     }
