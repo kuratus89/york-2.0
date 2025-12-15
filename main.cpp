@@ -6,40 +6,36 @@ using namespace std;
 
 
 
-void clearscreen(bool type) {
-    if(type){
-        cout.flush();
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
-    }
-    else cout << "\033[H";
-}
+
 
 // variables
 long long stage =0;// 0= screen calibrate
 long long frame_time = 50;
 bool clr_scr =0;
 bool clr__scr =0;
-vector<vector<char>> screen;
-vector<vector<char>> prescreen;
+vector<vector<char>> screen_char;
+
 bool print_screen = 0;
 long long x=3;
 long long y=3;
 long long sta=0;
-stack<long long> menu;
+stack<string> menu;
+string screen;
+string prescreen;
+
+vector<vector<char>> void_screen(x , vector<char> (y ,' '));
 
 
 
 
 
-void printer(vector<vector<char>>scn){
+string  conchtos(vector<vector<char>>scn){
+    string s;
     for(auto vol:scn){
-        for(auto val:vol)cout<<val;
-        cout<<endl;
+        for(auto val:vol)s.push_back(val);
+        s.push_back('\n');
     }
+    return s;    
 }
 vector<vector<char>> screenresize(long long x , long long y){
     vector<vector<char>> scr(x , vector<char> (y , ' '));
@@ -49,15 +45,39 @@ vector<vector<char>> screenresize(long long x , long long y){
     for(long long i=0 ; i<x ; i++)scr[i][y-1]='|';
     return scr;
 }
+void clearscreen(bool type) {
+    if(type){
+        cout.flush();
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+    }
+    else {
+        cout << "\033[H";
+        // cout << "\033[2J\033[H";
+        // printer(void_screen);
+    }
+}
+
+void printer(vector<vector<char>> vec , bool hilou){
+    string s=conchtos(vec);  
+    if(s!=screen){
+        screen =s;
+        clearscreen(hilou);
+        cout<<screen;
+    }
+}
 
 int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    // ios::sync_with_stdio(false);
+    // cin.tie(nullptr);
     cout << "\033[?25l";
-    screen = screenresize(x,y);
+    screen_char = screenresize(x,y);
     input::event e;
     string k="-";
-    menu.push(0);
+    menu.push("screen_calibrate");
     cout<<"Calibrate your screen"<<endl<<endl<<"press w,a,s,d to calibrate"<<endl<<endl<<"press enter to start calibrate your screen";
                 
     while (true) {
@@ -74,17 +94,17 @@ int main(){
             clr_scr=0;
         }
         if(clr_scr&&print_screen){
-            clearscreen(1);
-            printer(screen);
+            printer(screen_char , 1);
             clr_scr=0;
             print_screen=0;
         }
         if(clr__scr&&print_screen){
-            clearscreen(0);
-            printer(screen);
+            // clearscreen(0);
+            printer(screen_char,0);
             clr_scr=0;
             print_screen=0;
         }
+        
         this_thread::sleep_for(chrono::milliseconds(frame_time));
 
         if (input::pollEvent(e)) {
@@ -104,7 +124,7 @@ int main(){
         }
         else k="-";
         // cout<<k;
-        if(menu.top()==0){
+        if(menu.top()=="screen_calibrate"){
             
             if(sta==0){
                 if(k=="ent"){
@@ -137,15 +157,25 @@ int main(){
                     ud=1;
 
                 }
-                prescreen = screen;
-                screen =screenresize(x,y);
+                else if(k=="ent"){
+                    menu.pop();
+                    menu.push("main_menu");
+                    clearscreen(1);
+                }
+                
                 if(ud){
+                    screen_char =screenresize(x,y);
                     if(ud2)clr_scr=1;
                     else clr__scr=1;
                     print_screen=1;
                 }
                 
             }
+        }
+        else if(menu.top()=="main_menu"){
+            
+            
+
         }
 
     }
