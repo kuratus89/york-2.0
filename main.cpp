@@ -18,7 +18,7 @@ vector<vector<char>> screen_char;
 bool print_screen = 0;
 long long x=3;
 long long y=3;
-long long sta=0;
+bool fmc=1;
 stack<pair<string,map<string ,long long>>> menu;
 string screen;
 vector<vector<char>> void_screen(x , vector<char> (y ,' '));
@@ -70,14 +70,20 @@ void screen_size_limit(){
     this_thread::sleep_for(chrono::milliseconds(5000));
     exit(0);
 }
-vector<vector<char>> screen_maker(vector<string>&socho){
+vector<vector<char>> screen_maker(vector<string>&socho , bool vibo){
     vector<vector<char>> dominator = screenresize(x,y);
     long long xo=1;
     for(auto val:socho){
-        if(xo+1==x)screen_size_limit();
+        if(xo+1==x){
+            if(vibo)screen_size_limit();
+            else continue;
+        }
         long long yo=1;
         for(auto valo:val){
-            if(yo+1==y)screen_size_limit();
+            if(yo+1==y){
+                if(vibo)screen_size_limit();
+                else continue;
+            }
             dominator[xo][yo]=valo;
             yo++;
         }
@@ -95,7 +101,7 @@ int main(){
     input::event e;
     string k="-";
     menu.push({("main_menu"), {{}}});
-    menu.push({"screen_calibrate" , {{}}});
+    menu.push({"screen_calibrate" , {{"sta",0}}});
     cout<<"Calibrate your screen"<<endl<<endl<<"controls-> w,a,s,d , enter , space"<<endl<<endl<<"press enter to start calibrate your screen";
                 
     while (true) {
@@ -135,21 +141,29 @@ int main(){
             if(e.keycode == input::key::D)k="d"; 
             if(e.keycode == input::key::Enter)k="ent"; 
             if(e.keycode == input::key::Space)k="spc"; 
+            if(e.keycode == input::key::Num0)k='0';
+            if(e.keycode == input::key::Num1)k='1';
+            if(e.keycode == input::key::Num2)k='2';
+            if(e.keycode == input::key::Num3)k='3';
+            if(e.keycode == input::key::Num4)k='4';
+            if(e.keycode == input::key::Num5)k='5';
+            if(e.keycode == input::key::Num6)k='6';
+            if(e.keycode == input::key::Num7)k='7';
+            if(e.keycode == input::key::Num8)k='8';
+            if(e.keycode == input::key::Num9)k='9';
             // cout<<(int)e.key<<endl;      
-            if(e.keycode == input::key::C){
-                menu.pop();
-                continue;
-            }
+            // if(e.keycode == input::key::C){
+            //     menu.pop();
+            //     continue;
+            // }
         
         }
         // cout<<k;
         if(menu.top().first=="screen_calibrate"){
-
-            
-            
-            if(sta==0){
+            if(menu.top().second.count("sta")==0)menu.top().second["sta"]=1;
+            if(menu.top().second["sta"]==0){
                 if((k=="ent")||(k=="spc")){
-                    sta=1;
+                    menu.top().second["sta"]=1;
                     clr_scr=1;
                     print_screen=1;
                 }
@@ -205,11 +219,11 @@ int main(){
             schco.push_back(main_menu_data["tittle"]);
             schco.push_back("");
             
-            for(long long i=0 ; i<options.size() ; i++){
+            for(long long i=0 ; i<(long long)options.size() ; i++){
                 if(i==menu.top().second["selecter"])schco.push_back("->"+options[i]);
                 else schco.push_back(options[i]);
             }
-            printer(screen_maker(schco),0);
+            printer(screen_maker(schco,fmc),0);
             if(k=="w")menu.top().second["selecter"]--;
             if(k=="s")menu.top().second["selecter"]++;
             if(menu.top().second["selecter"]>=(long long )options.size())menu.top().second["selecter"]=0;
@@ -220,23 +234,88 @@ int main(){
         else if(menu.top().first=="quit")break;
 
         else if(menu.top().first=="settings"){
+            if(menu.top().second.count("is_result_yes_or_no")!=0){
+                menu.top().second.erase("is_result_yes_or_no");
+                bool ano;
+                if(menu.top().second["result"]==0)ano=0;
+                else if(menu.top().second["result"]==1)ano=1;
+                else continue;
+                long long data_type = menu.top().second["data_type"];
+                if(data_type==1)fmc=ano;
+            }
             if(menu.top().second.count("selecter")==0)menu.top().second["selecter"]=0;
             vector<string> colin;
-            vector<string> opt = {"screen_calibrate", "quit"};
-            vector<string> options= {"Screen calibration", "Quit"};
+            vector<string> opt = {"screen_calibrate","yes_or_no_selecter", "quit"};
+            vector<string> options= {"Screen calibration","Force minimum screen size", "Quit"};
             colin.push_back("SETTINGS");
-            for(long long i=0 ; i<options.size() ; i++){
+            for(long long i=0 ; i<((long long)options.size()) ; i++){
                 if(i==menu.top().second["selecter"])colin.push_back("->"+options[i]);
                 else colin.push_back(options[i]);
             }
-            printer(screen_maker(colin) ,0);
+            printer(screen_maker(colin,fmc) ,0);
             if(k=="w")menu.top().second["selecter"]--;
             if(k=="s")menu.top().second["selecter"]++;
             if(menu.top().second["selecter"]>=(long long )options.size())menu.top().second["selecter"]=0;
             if(menu.top().second["selecter"]<0)menu.top().second["selecter"] = (long long )options.size()-1;
-            if((k=="ent")||(k=="spc"))if(opt[menu.top().second["selecter"]]=="quit")menu.pop();
-            else if((k=="spc")||(k=="ent"))menu.push({opt[menu.top().second["selecter"]], {{}}});
+            if((k=="ent")||(k=="spc")){
+                long long sel =menu.top().second["selecter"];
+                if(opt[sel]=="quit")menu.pop();
+                else menu.push({opt[sel], {{}}});
+                if(options[sel]=="Force minimum screen size"){
+                    menu.top().second["value"]=fmc;
+                    menu.top().second["value_type"]=1;
+                }
+            }
+
+            
+        }
+        else if(menu.top().first=="yes_or_no_selecter"){
+            if(menu.top().second.count("selecter")==0)menu.top().second["selecter"]=0;
+            vector<string> giuponico;
+            if(menu.top().second.count("value")!=0){
+                string current_data = "current value => ";
+                if(menu.top().second["value"]==1)current_data+="Yes";
+                else current_data+="No";
+                giuponico.push_back(current_data);
+                giuponico.push_back("");
+            }
+            giuponico.push_back("select option");
+            giuponico.push_back("");
+            vector<long long> opt = {1,0,-1};
+            vector<string> options= {"Yes", "No" , "Cancel"};
+            for(long long i=0 ; i<((long long)options.size()) ; i++){
+                if(i==menu.top().second["selecter"])giuponico.push_back("->"+options[i]);
+                else giuponico.push_back(options[i]);
+            }
+            printer(screen_maker(giuponico,fmc) ,0);
+            if(k=="w")menu.top().second["selecter"]--;
+            if(k=="s")menu.top().second["selecter"]++;
+            if(menu.top().second["selecter"]>=(long long )options.size())menu.top().second["selecter"]=0;
+            if(menu.top().second["selecter"]<0)menu.top().second["selecter"] = (long long )options.size()-1;
+            if((k=="ent")||(k=="spc")){
+                long long trans = opt[menu.top().second["selecter"]];
+                long long data = menu.top().second["value_type"];
+                menu.pop();
+                if(trans==-1)continue;
+                menu.top().second["result"]=trans;
+                menu.top().second["is_result_yes_or_no"]=1;
+                menu.top().second["data_type"]=data;
+            }
+        }
+        else if(menu.top().first=="num_selecter"){
+            if(menu.top().second.count("selecter")==0)menu.top().second["selecter"]=0;
+            vector<string> killua;
+            if(menu.top().second.count("value")!=0){
+                string gon = "current value => ";
+                gon+=to_string(menu.top().second["value"]);
+                killua.push_back(gon);
+                killua.push_back("");
+            }
+            killua.push_back("enter new value");
+            
+
         }
 
     }
+    
 }
