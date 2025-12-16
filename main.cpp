@@ -19,12 +19,10 @@ bool print_screen = 0;
 long long x=3;
 long long y=3;
 long long sta=0;
-stack<string> menu;
+stack<pair<string,map<string ,long long>>> menu;
 string screen;
 vector<vector<char>> void_screen(x , vector<char> (y ,' '));
 map<string, string> main_menu_data ={{"tittle","WELCOME TO YORK" },{"selecter","0"}};
-long long main_menu_selecter=0;
-long long settings_selecter=0;
 
 string  conchtos(vector<vector<char>>scn){
     string s;
@@ -96,7 +94,8 @@ int main(){
     screen_char = screenresize(x,y);
     input::event e;
     string k="-";
-    menu.push("screen_calibrate");
+    menu.push({("main_menu"), {{}}});
+    menu.push({"screen_calibrate" , {{}}});
     cout<<"Calibrate your screen"<<endl<<endl<<"controls-> w,a,s,d , enter , space"<<endl<<endl<<"press enter to start calibrate your screen";
                 
     while (true) {
@@ -144,7 +143,9 @@ int main(){
         
         }
         // cout<<k;
-        if(menu.top()=="screen_calibrate"){
+        if(menu.top().first=="screen_calibrate"){
+
+            
             
             if(sta==0){
                 if((k=="ent")||(k=="spc")){
@@ -153,10 +154,16 @@ int main(){
                     print_screen=1;
                 }
                 
-                
             }
             else {
                 bool ud=0, ud2=0;
+                if(menu.top().second.count("first_time")==0)menu.top().second["first_time"]=0;
+                if(menu.top().second["first_time"]==0){
+                    menu.top().second["first_time"]=1;
+                    ud2=1;
+                    ud=1;
+                }
+                
                 // cout<<"1";
                 if(k=="w"){
                     x = max(3LL , x-1);
@@ -177,9 +184,8 @@ int main(){
                     ud=1;
 
                 }
-                else if(k=="ent"){
+                else if((k=="ent")||(k=="spc")){
                     menu.pop();
-                    menu.push("main_menu");
                     clearscreen(1);
                 }
                 
@@ -192,45 +198,44 @@ int main(){
                 
             }
         }
-        else if(menu.top()=="main_menu"){
-            
+        else if(menu.top().first=="main_menu"){
+            if(menu.top().second.count("selecter")==0)menu.top().second["selecter"]=0;            
             vector<string> schco;
             vector<string> options = {"New Game" ,"Continue" ,"Load", "Settings" , "Quit"};
             schco.push_back(main_menu_data["tittle"]);
             schco.push_back("");
             
             for(long long i=0 ; i<options.size() ; i++){
-                if(i==main_menu_selecter)schco.push_back("->"+options[i]);
+                if(i==menu.top().second["selecter"])schco.push_back("->"+options[i]);
                 else schco.push_back(options[i]);
             }
             printer(screen_maker(schco),0);
-            if(k=="w")main_menu_selecter--;
-            if(k=="s")main_menu_selecter++;
-            if(main_menu_selecter>=(long long )options.size())main_menu_selecter=0;
-            if(main_menu_selecter<0)main_menu_selecter = (long long )options.size()-1;
+            if(k=="w")menu.top().second["selecter"]--;
+            if(k=="s")menu.top().second["selecter"]++;
+            if(menu.top().second["selecter"]>=(long long )options.size())menu.top().second["selecter"]=0;
+            if(menu.top().second["selecter"]<0)menu.top().second["selecter"] = (long long )options.size()-1;
             vector<string> opt = {"new_game" , "continue" , "load" , "settings" , "quit"};
-            if((k=="spc")||(k=="ent"))menu.push(opt[main_menu_selecter]);                        
+            if((k=="spc")||(k=="ent"))menu.push({opt[menu.top().second["selecter"]] , {{}}});                        
         }
-        else if(menu.top()=="quit")break;
+        else if(menu.top().first=="quit")break;
 
-        else if(menu.top()=="settings"){
+        else if(menu.top().first=="settings"){
+            if(menu.top().second.count("selecter")==0)menu.top().second["selecter"]=0;
             vector<string> colin;
-            vector<string> opt = {"quit"};
-            vector<string> options= {"Quit"};
+            vector<string> opt = {"screen_calibrate", "quit"};
+            vector<string> options= {"Screen calibration", "Quit"};
             colin.push_back("SETTINGS");
             for(long long i=0 ; i<options.size() ; i++){
-                if(i==settings_selecter)colin.push_back("->"+options[i]);
+                if(i==menu.top().second["selecter"])colin.push_back("->"+options[i]);
                 else colin.push_back(options[i]);
             }
             printer(screen_maker(colin) ,0);
-            if(k=="w")settings_selecter--;
-            if(k=="s")settings_selecter++;
-            if(settings_selecter>=(long long )options.size())settings_selecter=0;
-            if(settings_selecter<0)settings_selecter = (long long )options.size()-1;
-            if((k=="ent")||(k=="spc")){
-                if(opt[settings_selecter]=="quit")menu.pop();
-            }
-
+            if(k=="w")menu.top().second["selecter"]--;
+            if(k=="s")menu.top().second["selecter"]++;
+            if(menu.top().second["selecter"]>=(long long )options.size())menu.top().second["selecter"]=0;
+            if(menu.top().second["selecter"]<0)menu.top().second["selecter"] = (long long )options.size()-1;
+            if((k=="ent")||(k=="spc"))if(opt[menu.top().second["selecter"]]=="quit")menu.pop();
+            else if((k=="spc")||(k=="ent"))menu.push({opt[menu.top().second["selecter"]], {{}}});
         }
 
     }
