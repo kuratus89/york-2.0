@@ -93,6 +93,31 @@ vector<vector<char>> screen_maker(vector<string>&socho , bool vibo){
     
 }
 
+vector<vector<char>> screen_maker_advance(vector<vector<string>> &doflamingo , bool bulao){
+    vector<vector<char>> dominator = screenresize(x,y);
+    long long xo=1 , yo=1;
+    for(auto valo:doflamingo){
+        y=1;
+        if(xo+1==x){
+            if(bulao)screen_size_limit();
+            else continue;
+        } 
+        for(auto val:valo){
+            for(auto vol:val){
+                if(yo+1==y){
+                    if(bulao)screen_size_limit();
+                    else break;
+                }
+                dominator[x][y]=vol;
+                yo++;
+            }
+            y++;
+        }
+        x++;
+    }
+    return dominator;
+}
+
 int main(){
     // ios::sync_with_stdio(false);
     // cin.tie(nullptr);
@@ -151,6 +176,7 @@ int main(){
             if(e.keycode == input::key::Num7)k='7';
             if(e.keycode == input::key::Num8)k='8';
             if(e.keycode == input::key::Num9)k='9';
+            if(e.keycode == input::key::Backspace)k="back";
             // cout<<(int)e.key<<endl;      
             // if(e.keycode == input::key::C){
             //     menu.pop();
@@ -243,10 +269,15 @@ int main(){
                 long long data_type = menu.top().second["data_type"];
                 if(data_type==1)fmc=ano;
             }
+            if(menu.top().second.count("num_result")!=0){
+                menu.top().second.erase("num_result");
+                long long number = menu.top().second["result"];
+                if(menu.top().second["data_type"]==1)frame_time=number;
+            }
             if(menu.top().second.count("selecter")==0)menu.top().second["selecter"]=0;
             vector<string> colin;
-            vector<string> opt = {"screen_calibrate","yes_or_no_selecter", "quit"};
-            vector<string> options= {"Screen calibration","Force minimum screen size", "Quit"};
+            vector<string> opt = {"screen_calibrate", "num_selecter","yes_or_no_selecter", "quit"};
+            vector<string> options= {"Screen calibration" , "Frame time","Force minimum screen size", "Quit"};
             colin.push_back("SETTINGS");
             for(long long i=0 ; i<((long long)options.size()) ; i++){
                 if(i==menu.top().second["selecter"])colin.push_back("->"+options[i]);
@@ -265,6 +296,11 @@ int main(){
                     menu.top().second["value"]=fmc;
                     menu.top().second["value_type"]=1;
                 }
+                if(options[sel]=="Frame time"){
+                    menu.top().second["value"]=frame_time;
+                    menu.top().second["value_type"]=1;
+                }
+                
             }
 
             
@@ -303,15 +339,41 @@ int main(){
             }
         }
         else if(menu.top().first=="num_selecter"){
-            if(menu.top().second.count("selecter")==0)menu.top().second["selecter"]=0;
-            vector<string> killua;
+            vector<string> shaun_the_sheep;
+            shaun_the_sheep.push_back("Enter Number");
+            shaun_the_sheep.push_back("");
             if(menu.top().second.count("value")!=0){
-                string gon = "current value => ";
-                gon+=to_string(menu.top().second["value"]);
-                killua.push_back(gon);
-                killua.push_back("");
+                if(menu.top().second.count("num")==0)menu.top().second["num"]=menu.top().second["value"];
+                string karela = "Current Value => ";
+                karela+=to_string(menu.top().second["value"]);
+                shaun_the_sheep.push_back(karela);
+                shaun_the_sheep.push_back("");
             }
-            killua.push_back("enter new value");
+            if(menu.top().second.count("num")==0)menu.top().second["num"]=0;
+            long long num = menu.top().second["num"];
+            shaun_the_sheep.push_back(to_string(num));
+            printer(screen_maker(shaun_the_sheep,fmc),0);
+            if(k=="0")num = (num*10);
+            // if(k=="6")cout<<"uwu";
+            else if(k=="1")num=(num*10)+1;
+            else if(k=="2")num=(num*10)+2;
+            else if(k=="3")num=(num*10)+3;
+            else if(k=="4")num=(num*10)+4;
+            else if(k=="5")num=(num*10)+5;
+            else if(k=="6")num=(num*10)+6;
+            else if(k=="7")num=(num*10)+7;
+            else if(k=="8")num=(num*10)+8;
+            else if(k=="9")num=(num*10)+9;
+            else if(k=="back")num/=10;
+            else if((k=="ent")||(k=="spc")){
+                long long data = menu.top().second["value_type"];
+                menu.pop();
+                menu.top().second["data_type"]=data;
+                menu.top().second["num_result"]=1;
+                menu.top().second["result"]=num;
+            }
+            menu.top().second["num"]=num;
+            
             
 
         }
