@@ -23,6 +23,7 @@ stack<pair<string,map<string ,long long>>> menu;
 string screen;
 vector<vector<char>> void_screen(x , vector<char> (y ,' '));
 map<string, string> main_menu_data ={{"tittle","WELCOME TO YORK" },{"selecter","0"}};
+map<string , string> alpha = {{"A","a"},{"B","b"},{"C","c"},{"D","d"},{"E","e"},{"F","f"},{"G","g"},{"H","h"},{"I","i"},{"J","j"},{"K","k"},{"L","l"},{"M","m"},{"N","n"},{"O","o"},{"P","p"},{"Q","q"},{"R","r"},{"S","s"},{"T","t"},{"U","u"},{"V","v"},{"W","w"},{"X","x"},{"Y","y"},{"Z","z"}};
 
 string  conchtos(vector<vector<char>>scn){
     string s;
@@ -177,6 +178,33 @@ int main(){
             if(e.keycode == input::key::Num8)k='8';
             if(e.keycode == input::key::Num9)k='9';
             if(e.keycode == input::key::Backspace)k="back";
+            if(e.keycode == input::key::A)k="a";
+            if(e.keycode == input::key::B)k="b";
+            if(e.keycode == input::key::C)k="c";
+            if(e.keycode == input::key::D)k="d";
+            if(e.keycode == input::key::E)k="e";
+            if(e.keycode == input::key::F)k="f";
+            if(e.keycode == input::key::G)k="g";
+            if(e.keycode == input::key::H)k="h";
+            if(e.keycode == input::key::I)k="i";
+            if(e.keycode == input::key::J)k="j";
+            if(e.keycode == input::key::K)k="k";
+            if(e.keycode == input::key::L)k="l";
+            if(e.keycode == input::key::M)k="m";
+            if(e.keycode == input::key::N)k="n";
+            if(e.keycode == input::key::O)k="o";
+            if(e.keycode == input::key::P)k="p";
+            if(e.keycode == input::key::Q)k="q";
+            if(e.keycode == input::key::R)k="r";
+            if(e.keycode == input::key::S)k="s";
+            if(e.keycode == input::key::T)k="t";
+            if(e.keycode == input::key::U)k="u";
+            if(e.keycode == input::key::V)k="v";
+            if(e.keycode == input::key::W)k="w";
+            if(e.keycode == input::key::X)k="x";
+            if(e.keycode == input::key::Y)k="y";
+            if(e.keycode == input::key::Z)k="z";
+            
             // cout<<(int)e.key<<endl;      
             // if(e.keycode == input::key::C){
             //     menu.pop();
@@ -241,6 +269,7 @@ int main(){
         else if(menu.top().first=="main_menu"){
             if(menu.top().second.count("selecter")==0)menu.top().second["selecter"]=0;            
             vector<string> schco;
+            vector<string> opt = {"new_game" , "continue" , "load" , "settings" , "quit"};
             vector<string> options = {"New Game" ,"Continue" ,"Load", "Settings" , "Quit"};
             schco.push_back(main_menu_data["tittle"]);
             schco.push_back("");
@@ -254,7 +283,6 @@ int main(){
             if(k=="s")menu.top().second["selecter"]++;
             if(menu.top().second["selecter"]>=(long long )options.size())menu.top().second["selecter"]=0;
             if(menu.top().second["selecter"]<0)menu.top().second["selecter"] = (long long )options.size()-1;
-            vector<string> opt = {"new_game" , "continue" , "load" , "settings" , "quit"};
             if((k=="spc")||(k=="ent"))menu.push({opt[menu.top().second["selecter"]] , {{}}});                        
         }
         else if(menu.top().first=="quit")break;
@@ -373,9 +401,7 @@ int main(){
                 menu.top().second["result"]=num;
             }
             menu.top().second["num"]=num;
-            
-            
-
+         
         }
 
     }
